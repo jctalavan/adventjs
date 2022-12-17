@@ -1,24 +1,47 @@
-const path = [[1], [1, 5], [7, 5, 8], [9, 4, 1, 3]];
+const path = [[0], [3, 4], [9, 8, 1]];
 
-let totalTimeUnits = 0;
+const pathDepth = path.length;
+let newPath = []
 
-const iterator = path.entries();
-let posAnterior = 0;
-
-for (const item of iterator) {
-  const index = item[0];
-  const values = item[1];
-
-  if (index === 0) {
-    totalTimeUnits += values[0];
-  } else {
-    const a = values.at(posAnterior);
-    const b = values.at(posAnterior + 1);
-
-    totalTimeUnits += a < b ? a : b;
-    posAnterior = a < b ? posAnterior : posAnterior + 1;
+path.forEach((valuesOriginal, indexOriginal) => {
+  const newLevel = []
+  if(indexOriginal === 0){
+    newLevel.push(...valuesOriginal)
   }
-}
+  else if (indexOriginal === 1){
+    const valuesOriginalPrev = path[0]
+    newLevel.push(valuesOriginalPrev[0] + valuesOriginal[0])
+    newLevel.push(valuesOriginalPrev[0] + valuesOriginal[1])
+  }
+  else{
+    const prevLevel = indexOriginal - 1
+    const prevLevelCountItems = newPath[prevLevel].length
+    
+    valuesOriginal.forEach((valueLevel, indexLevel) => {
+      let newValue = 0
+      if(indexLevel === 0){
+        newValue = valueLevel + newPath[prevLevel][0]
+      }
+      else if (indexLevel === prevLevelCountItems){
+        newValue = valueLevel + newPath[prevLevel][prevLevelCountItems - 1]
+      }
+      else{
+        const possibleA = valueLevel + newPath[prevLevel][indexLevel]
+        const possibleB = valueLevel +newPath[prevLevel][indexLevel - 1]
+        newValue = Math.min(possibleA, possibleB)
+      }
+      
+      newLevel.push(newValue)
+    })
+  }
+
+  newPath.push(newLevel)
+})
+
+const newPathDepth = newPath.length
+const valuesToGetMin = newPath[newPathDepth - 1]
+
+totalTimeUnits = Math.min(...valuesToGetMin)
 
 console.log(totalTimeUnits);
 
